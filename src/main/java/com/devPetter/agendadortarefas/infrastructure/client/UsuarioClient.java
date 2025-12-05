@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "usuario", url = "${usuario.url}") //Declara qual API vai ser usada(variavel declarada no properties)
 public interface UsuarioClient {
 
-    @GetMapping
+    @GetMapping("/usuario")
     UsuarioDTO buscarUsuarioPorEmail(@RequestParam("email") String email,
                                      @RequestHeader("Authorization") String token);
 }
