@@ -1,34 +1,26 @@
 package com.devPetter.agendadortarefas.infrastructure.security;
 
-import com.devPetter.usuario.infrastructure.entity.Usuario;
-import com.devPetter.usuario.infrastructure.repository.UsuarioRepository;
+import com.devPetter.agendadortarefas.business.dto.UsuarioDTO;
+import com.devPetter.agendadortarefas.infrastructure.client.UsuarioClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl{
 
-    // Repositório para acessar dados de usuário no banco de dados
+    @Autowired
+    private UsuarioClient client;
 
-    private final UsuarioRepository usuarioRepository;
 
-    public UserDetailsServiceImpl(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
-    }
-
-    // Implementação do método para carregar detalhes do usuário pelo e-mail
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Busca o usuário no banco de dados pelo e-mail
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
-
-        // Cria e retorna um objeto UserDetails com base no usuário encontrado
-        return org.springframework.security.core.userdetails.User
-                .withUsername(usuario.getEmail()) // Define o nome de usuário como o e-mail
-                .password(usuario.getSenha()) // Define a senha do usuário
+    public UserDetails carregaDadosUsuario(String email, String token){
+        UsuarioDTO usuarioDTO = client.buscarUsuarioPorEmail(email,  token);
+        return User
+                .withUsername(usuarioDTO.getEmail()) // Define o nome de usuário como o e-mail
+                .password(usuarioDTO.getSenha()) // Define a senha do usuário
                 .build(); // Constrói o objeto UserDetails
     }
 }
